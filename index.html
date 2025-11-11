@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Reloj Digital 74LS90</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .title {
+            color: white;
+            font-size: 32px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            color: #f0f0f0;
+            font-size: 16px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .clock-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+        
+        .format-label {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .displays {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .module {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .module-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .chip-container {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+        }
+        
+        .chip-name {
+            font-size: 10px;
+            color: #888;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        
+        .display {
+            width: 120px;
+            height: 180px;
+            background: #1a1a1a;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        
+        .digit {
+            font-size: 120px;
+            font-weight: bold;
+            color: #ff3333;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 10px #ff3333;
+        }
+        
+        .colon {
+            font-size: 60px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-start {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-pause {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .btn-pause:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+        }
+        
+        .btn-reset {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        
+        .btn-reset:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+        }
+        
+        .btn-speed {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            font-size: 14px;
+            padding: 10px 20px;
+        }
+        
+        .btn-speed:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 233, 123, 0.4);
+        }
+        
+        .info-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 800px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .info-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .counter-info {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .counter-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .counter-box.active {
+            border-color: #667eea;
+            background: #e8eaf6;
+        }
+        
+        .counter-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        
+        .counter-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .counter-binary {
+            font-size: 10px;
+            color: #666;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .signal-indicator {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .signal {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .signal-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ddd;
+            transition: all 0.3s;
+        }
+        
+        .signal-led.on {
+            background: #4caf50;
+            box-shadow: 0 0 10px #4caf50;
+        }
+        
+        .clock-speed {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .reset-warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            font-size: 14px;
+            color: #856404;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .reset-warning.show {
+            display: block;
+            animation: pulse 0.5s;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .flow-diagram {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            margin-top: 15px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title">🔌 Simulador de Reloj Digital 74LS90</h1>
+    <p class="subtitle">Simulación interactiva del circuito con contadores en cascada</p>
+    
+    <div class="clock-container">
+        <div class="format-label">Formato: MM:SS (Minutos : Segundos)</div>
+        
+        <div class="displays">
+            <!-- Decenas de Minutos -->
+            <div class="module">
+                <div class="module-label">U15<br>Decenas Min (0-5)</div>
+                <div class="chip-container">
+                    <div class="chip-name">74LS90</div>
+                    <div class="display">
+                        <div class="digit" id="min-tens">0</div>
+                    </div>
+                    <div class="chip-name">74LS47</div>
+                </div>
+            </div>
+            
+            <!-- Unidades de Minutos -->
+            <div class="module">
+                <div class="module-label">U13<br>Unidades Min (0-9)</div>
+                <div class="chip-container">
+                    <div class="chip-name">74LS90</div>
+                    <div class="display">
+                        <div class="digit" id="min-units">0</div>
+                    </div>
+                    <div class="chip-name">74LS47</div>
+                </div>
+            </div>
+            
+            <div class="colon">:</div>
+            
+            <!-- Decenas de Segundos -->
+            <div class="module">
+                <div class="module-label">U19<br>Decenas Seg (0-5)</div>
+                <div class="chip-container">
+                    <div class="chip-name">74LS90</div>
+                    <div class="display">
+                        <div class="digit" id="sec-tens">0</div>
+                    </div>
+                    <div class="chip-name">74LS47</div>
+                </div>
+            </div>
+            
+            <!-- Unidades de Segundos -->
+            <div class="module">
+                <div class="module-label">U18<br>Unidades Seg (0-9)</div>
+                <div class="chip-container">
+                    <div class="chip-name">74LS90</div>
+                    <div class="display">
+                        <div class="digit" id="sec-units">0</div>
+                    </div>
+                    <div class="chip-name">74LS47</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-start" onclick="startClock()">▶ Iniciar</button>
+            <button class="btn btn-pause" onclick="pauseClock()">⏸ Pausar</button>
+            <button class="btn btn-reset" onclick="resetClock()">🔄 Reset</button>
+            <button class="btn btn-speed" onclick="changeSpeed()">⚡ Velocidad: <span id="speed-label">1x</span></button>
+        </div>
+        
+        <div class="clock-speed">Frecuencia del 555: <span id="freq">1 Hz</span></div>
+        
+        <div class="flow-diagram">
+            📡 Flujo: 555 → U18 (0-9) → U19 (0-5) → U13 (0-9) → U15 (0-5) → Reset Global
+        </div>
+    </div>
+    
+    <div class="info-panel">
+        <div class="info-title">📊 Estado de los Contadores 74LS90</div>
+        
+        <div class="counter-info">
+            <div class="counter-box" id="box-u18">
+                <div class="counter-title">U18 - Unidades Seg</div>
+                <div class="counter-value" id="count-u18">0</div>
+                <div class="counter-binary">BCD: <span id="bin-u18">0000</span></div>
+            </div>
+            
+            <div class="counter-box" id="box-u19">
+                <div class="counter-title">U19 - Decenas Seg</div>
+                <div class="counter-value" id="count-u19">0</div>
+                <div class="counter-binary">BCD: <span id="bin-u19">0000</span></div>
+            </div>
+            
+            <div class="counter-box" id="box-u13">
+                <div class="counter-title">U13 - Unidades Min</div>
+                <div class="counter-value" id="count-u13">0</div>
+                <div class="counter-binary">BCD: <span id="bin-u13">0000</span></div>
+            </div>
+            
+            <div class="counter-box" id="box-u15">
+                <div class="counter-title">U15 - Decenas Min</div>
+                <div class="counter-value" id="count-u15">0</div>
+                <div class="counter-binary">BCD: <span id="bin-u15">0000</span></div>
+            </div>
+        </div>
+        
+        <div class="signal-indicator">
+            <div class="signal">
+                <div class="signal-led" id="co-u18"></div>
+                <span>CO U18 (Unid Seg)</span>
+            </div>
+            <div class="signal">
+                <div class="signal-led" id="co-u19"></div>
+                <span>CO U19 (Dec Seg)</span>
+            </div>
+            <div class="signal">
+                <div class="signal-led" id="co-u13"></div>
+                <span>CO U13 (Unid Min)</span>
+            </div>
+            <div class="signal">
+                <div class="signal-led" id="reset-global"></div>
+                <span>Reset Global</span>
+            </div>
+        </div>
+        
+        <div class="reset-warning" id="reset-warning">
+            ⚠️ Reset Global Activado: Todos los contadores en 59:59 - Reseteando a 00:00
+        </div>
+    </div>
+
+    <script>
+        // Contadores según el orden correcto: MM:SS
+        let u18 = 0; // Unidades de segundos (0-9) - Primer contador, recibe clock del 555
+        let u19 = 0; // Decenas de segundos (0-5)
+        let u13 = 0; // Unidades de minutos (0-9)
+        let u15 = 0; // Decenas de minutos (0-5)
+        
+        let interval = null;
+        let speed = 1000; // 1 segundo
+        let speedMultiplier = 1;
+        
+        function toBinary(num) {
+            return num.toString(2).padStart(4, '0');
+        }
+        
+        function updateDisplay() {
+            // Actualizar displays en formato MM:SS
+            document.getElementById('min-tens').textContent = u15;  // Decenas de minutos
+            document.getElementById('min-units').textContent = u13;  // Unidades de minutos
+            document.getElementById('sec-tens').textContent = u19;  // Decenas de segundos
+            document.getElementById('sec-units').textContent = u18;  // Unidades de segundos
+            
+            // Actualizar información de contadores
+            document.getElementById('count-u18').textContent = u18;
+            document.getElementById('count-u19').textContent = u19;
+            document.getElementById('count-u13').textContent = u13;
+            document.getElementById('count-u15').textContent = u15;
+            
+            document.getElementById('bin-u18').textContent = toBinary(u18);
+            document.getElementById('bin-u19').textContent = toBinary(u19);
+            document.getElementById('bin-u13').textContent = toBinary(u13);
+            document.getElementById('bin-u15').textContent = toBinary(u15);
+        }
+        
+        function highlightActive(counter) {
+            const boxes = ['box-u18', 'box-u19', 'box-u13', 'box-u15'];
+            boxes.forEach(box => document.getElementById(box).classList.remove('active'));
+            document.getElementById('box-' + counter).classList.add('active');
+        }
+        
+        function setCarryOut(counter, state) {
+            const led = document.getElementById('co-' + counter);
+            if(state) {
+                led.classList.add('on');
+                setTimeout(() => led.classList.remove('on'), 200);
+            }
+        }
+        
+        function showResetWarning() {
+            const warning = document.getElementById('reset-warning');
+            warning.classList.add('show');
+            document.getElementById('reset-global').classList.add('on');
+            setTimeout(() => {
+                warning.classList.remove('show');
+                document.getElementById('reset-global').classList.remove('on');
+            }, 1000);
+        }
+        
+        function tick() {
+            // Primero incrementa U18 (unidades de segundos) - recibe clock del 555
+            u18++;
+            highlightActive('u18');
+            
+            // Si U18 llega a 10, resetea y activa carry
+            if(u18 >= 10) {
+                u18 = 0;
+                setCarryOut('u18', true);
+                
+                // Incrementar U19 (decenas de segundos)
+                u19++;
+                highlightActive('u19');
+                
+                // Si U19 llega a 6, resetea y activa carry
+                if(u19 >= 6) {
+                    u19 = 0;
+                    setCarryOut('u19', true);
+                    
+                    // Incrementar U13 (unidades de minutos)
+                    u13++;
+                    highlightActive('u13');
+                    
+                    // Si U13 llega a 10, resetea y activa carry
+                    if(u13 >= 10) {
+                        u13 = 0;
+                        setCarryOut('u13', true);
+                        
+                        // Incrementar U15 (decenas de minutos)
+                        u15++;
+                        highlightActive('u15');
+                        
+                        // Si U15 llega a 6, resetea
+                        if(u15 >= 6) {
+                            u15 = 0;
+                        }
+                    }
+                }
+            }
+            
+            // Verificar condición de reset global (59:59)
+            // 59:59 significa: u15=5, u13=9, u19=5, u18=9
+            if(u15 === 5 && u13 === 9 && u19 === 5 && u18 === 9) {
+                setTimeout(() => {
+                    showResetWarning();
+                    u18 = 0;
+                    u19 = 0;
+                    u13 = 0;
+                    u15 = 0;
+                    updateDisplay();
+                }, 500);
+            }
+            
+            updateDisplay();
+        }
+        
+        function startClock() {
+            if(interval) return;
+            interval = setInterval(tick, speed);
+        }
+        
+        function pauseClock() {
+            if(interval) {
+                clearInterval(interval);
+                interval = null;
+            }
+        }
+        
+        function resetClock() {
+            pauseClock();
+            u18 = 0;
+            u19 = 0;
+            u13 = 0;
+            u15 = 0;
+            updateDisplay();
+            
+            const boxes = ['box-u18', 'box-u19', 'box-u13', 'box-u15'];
+            boxes.forEach(box => document.getElementById(box).classList.remove('active'));
+        }
+        
+        function changeSpeed() {
+            const speeds = [
+                {mult: 1, speed: 1000, label: '1x', freq: '1 Hz'},
+                {mult: 10, speed: 100, label: '10x', freq: '10 Hz'},
+                {mult: 100, speed: 10, label: '100x', freq: '100 Hz'},
+                {mult: 1000, speed: 1, label: '1000x', freq: '1 kHz'}
+            ];
+            
+            let currentIndex = speeds.findIndex(s => s.mult === speedMultiplier);
+            currentIndex = (currentIndex + 1) % speeds.length;
+            
+            speedMultiplier = speeds[currentIndex].mult;
+            speed = speeds[currentIndex].speed;
+            
+            document.getElementById('speed-label').textContent = speeds[currentIndex].label;
+            document.getElementById('freq').textContent = speeds[currentIndex].freq;
+            
+            if(interval) {
+                pauseClock();
+                startClock();
+            }
+        }
+        
+        // Inicializar display
+        updateDisplay();
+    </script>
+</body>
+</html>
